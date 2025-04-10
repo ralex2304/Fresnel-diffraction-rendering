@@ -1,5 +1,7 @@
 add_library(fdr-defaults INTERFACE)
 
+target_compile_features(fdr-defaults INTERFACE cxx_std_20)
+
 target_compile_options(fdr-defaults
     INTERFACE
         -fdiagnostics-color=always
@@ -44,7 +46,6 @@ target_compile_options(fdr-defaults
             -Og
             -g3
             -ggdb
-            -fsanitize=address,leak,undefined,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
         >
 
         $<$<CONFIG:Release>:
@@ -61,7 +62,6 @@ target_link_options(fdr-defaults
             -Og
             -g3
             -ggdb
-            -fsanitize=address,leak,undefined,bool,bounds,enum,float-cast-overflow,float-divide-by-zero,integer-divide-by-zero,leak,nonnull-attribute,null,object-size,return,returns-nonnull-attribute,shift,signed-integer-overflow,undefined,unreachable,vla-bound,vptr
         >
 
         $<$<CONFIG:Release>:

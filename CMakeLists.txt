@@ -17,6 +17,7 @@ include(cmake/defaults.cmake)
 
 include(cmake/third_party.cmake)
 
+add_subdirectory(src/FdrWindow)
 
 add_executable(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
@@ -24,7 +25,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE ASSETS_PATH="${ASSETS_LOCATION}")
 
-set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 20 OUTPUT_NAME ${PROJECT_NAME})
-
-target_link_libraries(${PROJECT_NAME} PRIVATE fdr-defaults glad glfw ImGui OpenGL-shader-lib::OpenGL-shader-lib)
+target_link_libraries(${PROJECT_NAME} PRIVATE fdr-defaults FdrWindow)
 
