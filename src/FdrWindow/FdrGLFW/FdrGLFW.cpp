@@ -1,11 +1,11 @@
 #include <cassert>
 #include <string>
-#include <format>
 
 #include "FdrWindow/FdrGLFW/FdrGLFW.hpp"
 
+namespace FdrGLFW {
+
 using namespace std::literals;
-using namespace FdrGLFW;
 
 GLFW::GLFW(const int width, const int height, const std::string& title,
            const opengl_version_t& gl_version) {
@@ -36,11 +36,9 @@ GLFW::GLFW(const int width, const int height, const std::string& title,
     assert(window_);
 }
 
-GLFW::~GLFW() noexcept {
+GLFW::~GLFW() {
     glfwDestroyWindow(window_);
     glfwTerminate();
-
-    window_ = nullptr;
 }
 
 void GLFW::process() const noexcept {
@@ -64,4 +62,6 @@ void GLFW::framebuffer_size_callback(GLFWwindow* window, int width, int height) 
 
     glViewport(0, 0, width, height);
 }
+
+}; //< namespace FdrGLFW
 

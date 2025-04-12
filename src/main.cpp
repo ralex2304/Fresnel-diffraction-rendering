@@ -1,19 +1,16 @@
-#include <cassert>
-
 #include "FdrWindow/FdrGLFW/FdrGLFW.hpp"
 #include "FdrWindow/FdrWindow.hpp"
 
 using namespace FdrWindow;
 
-const unsigned int SCREEN_WIDTH  = 800;
-const unsigned int SCREEN_HEIGHT = 800;
-
 int main() {
+    constexpr unsigned int kScreenWidth  = 800;
+    constexpr unsigned int kScreenHeight = 800;
 
-    constexpr opengl_version_t OPENGL_VERSION = {.context_version_major = 3,
-                                                 .context_version_minor = 3};
+    constexpr FdrGLFW::opengl_version_t kOpenglVersion = {.context_version_major = 3,
+                                                          .context_version_minor = 3};
 
-    Window window(SCREEN_WIDTH, SCREEN_HEIGHT, "Fresnel diffraction", OPENGL_VERSION,
+    Window window(kScreenWidth, kScreenHeight, "Fresnel diffraction", kOpenglVersion,
                   ASSETS_PATH"/shaders/fdr.vs", ASSETS_PATH"/shaders/fdr.fs");
 
     while (!window.should_close()) {
