@@ -1,5 +1,6 @@
 
 add_library(FdrWindow STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/FdrParameters/FdrParameters.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FdrOpenGLRender/FdrOpenGLRender.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/FdrGLFW/FdrGLFW.cpp
 )
