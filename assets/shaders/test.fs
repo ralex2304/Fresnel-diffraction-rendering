@@ -3,6 +3,12 @@ out vec4 FragColor;
 
 in vec3 position;
 
+uniform bool  u_show_pattern;
+uniform bool  u_show_grid;
+uniform float u_slit_width;
+uniform float u_wavelength;
+uniform float u_distance;
+
 void main()
 {
     float d = distance(position, vec3(0.0f, 0.0f, 0.0f));
