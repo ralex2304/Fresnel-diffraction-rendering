@@ -9,61 +9,57 @@
 #include <GLFW/glfw3.h>
 
 #include <OpenGL-shader-lib/OpenGL-shader-lib.hpp>
+#include "../FdrParameters.hpp"
 
 using namespace OpenGLShaderLib;
 
-class DiffractionParams {
+class ShaderController : public FdrParameters::ParameterRenewer {
     private:
-        float slit_width = 0.1f;  
-        float wavelength = 550.0f;
-        float distance   = 1000.0f;       
-    public:
-        void setSlitWidth(float width) { 
-            slit_width = (width < 0.01f) ? 0.01f : (width > 2.0f) ? 2.0f : width; 
-        }
-        float getSlitWidth() const { return slit_width; }
-        
-        void setWavelength(float wave) { 
-            wavelength = (wave < 380.0f) ? 380.0f : (wave > 780.0f) ? 780.0f : wave; 
-        }
-        float getWavelength() const { return wavelength; }
-        
-        void setDistance(float dist) { 
-            distance = (dist < 100.0f) ? 100.0f : (dist > 5000.0f) ? 5000.0f : dist; 
-        }
-        float getDistance() const { return distance; }
-        
-        bool showPattern = true;  
-        bool showGrid    = false;    
-};
-
-class ShaderController {
-    private:
-        OpenGLShaderLib::Shader& shader;        
+        OpenGLShaderLib::Shader& shader;
     public:
         ShaderController(OpenGLShaderLib::Shader& shader) : shader(shader) {}
-        
-        void setUniform(const std::string& name, bool value) {
+    
+        void renew(const std::string& name, bool value) const noexcept override {
             shader.use();
             GLint program;
             glGetIntegerv(GL_CURRENT_PROGRAM, &program);
             GLint loc = glGetUniformLocation(program, name.c_str());
-            if(loc != -1) {
-                glUniform1i(loc, value ? 1 : 0);
-            }
+            if (loc != -1) glUniform1i(loc, value);
         }
-        
-        void setUniform(const std::string& name, float value) {
+    
+        void renew(const std::string& name, int value) const noexcept override {
             shader.use();
             GLint program;
             glGetIntegerv(GL_CURRENT_PROGRAM, &program);
             GLint loc = glGetUniformLocation(program, name.c_str());
-            if(loc != -1) {
-                glUniform1f(loc, value);
-            }
+            if (loc != -1) glUniform1i(loc, value);
         }
-        
+    
+        void renew(const std::string& name, float value) const noexcept override {
+            shader.use();
+            GLint program;
+            glGetIntegerv(GL_CURRENT_PROGRAM, &program);
+            GLint loc = glGetUniformLocation(program, name.c_str());
+            if (loc != -1) glUniform1f(loc, value);
+        }
+    
         void use() { shader.use(); }
+    };
+
+class DiffractionParams {
+    public:
+        FdrParameters::Parameter<float> slit_width;
+        FdrParameters::Parameter<float> wavelength;
+        FdrParameters::Parameter<float> distance;
+        FdrParameters::Parameter<bool> showPattern;
+        FdrParameters::Parameter<bool> showGrid;
+
+        DiffractionParams(const FdrParameters::ParameterRenewer& renewer)
+            : slit_width(renewer, "u_slit_width", 0.1f),
+            wavelength(renewer, "u_wavelength", 550.0f),
+            distance(renewer, "u_distance", 1000.0f),
+            showPattern(renewer, "u_show_pattern", true),
+            showGrid(renewer, "u_show_grid", false) {}
 };
 
 class UIRenderer {
@@ -79,25 +75,32 @@ class UIRenderer {
                 ImGuiWindowFlags_NoCollapse
             );
             
-            ImGui::Checkbox("Show pattern", &params.showPattern);
-            ImGui::Checkbox("Show grid", &params.showGrid);
+            bool showPattern = params.showPattern.get();
+            if (ImGui::Checkbox("Show pattern", &showPattern)) {
+                params.showPattern.set_and_renew(showPattern);
+            }
+            
+            bool showGrid = params.showGrid.get();
+            if (ImGui::Checkbox("Show grid", &showGrid)) {
+                params.showGrid.set_and_renew(showGrid);
+            }
             
             ImGui::Separator();
             ImGui::Text("Slit Parameters:");
             
-            float slit_width = params.getSlitWidth();
-            if(ImGui::InputFloat("Slit width (mm)", &slit_width, 0.01f, 0.1f, "%.3f")) {
-                params.setSlitWidth(slit_width);
+            float slit_width = params.slit_width.get();
+            if (ImGui::InputFloat("Slit width (mm)", &slit_width, 0.01f, 0.1f, "%.3f")) {
+                params.slit_width.set_and_renew(slit_width);
             }
             
-            float wavelength = params.getWavelength();
-            if(ImGui::InputFloat("Wavelength (nm)", &wavelength, 1.0f, 10.0f, "%.1f")) {
-                params.setWavelength(wavelength);
+            float wavelength = params.wavelength.get();
+            if (ImGui::InputFloat("Wavelength (nm)", &wavelength, 1.0f, 10.0f, "%.1f")) {
+                params.wavelength.set_and_renew(wavelength);
             }
             
-            float distance = params.getDistance();
-            if(ImGui::InputFloat("Distance (mm)", &distance, 10.0f, 100.0f, "%.0f")) {
-                params.setDistance(distance);
+            float distance = params.distance.get();
+            if (ImGui::InputFloat("Distance (mm)", &distance, 10.0f, 100.0f, "%.0f")) {
+                params.distance.set_and_renew(distance);
             }
             
             ImGui::End();
@@ -121,7 +124,7 @@ int main() {
 #endif
 
     GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Fresnel diffraction", NULL, NULL);
-    if(window == NULL) {
+    if (window == NULL) {
         std::cerr << "Failed to create GLFW window" << std::endl;
         glfwTerminate();
         return -1;
@@ -130,7 +133,7 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    if(!gladLoadGL(glfwGetProcAddress)) {
+    if (!gladLoadGL(glfwGetProcAddress)) {
         std::cerr << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
@@ -148,6 +151,7 @@ int main() {
 
     Shader shader(ASSETS_PATH"/shaders/test.vs", ASSETS_PATH"/shaders/test.fs");
     ShaderController shaderController(shader);
+    DiffractionParams params(shaderController);
 
     constexpr float vertices[] = {
         0.5f, 0.5f, 0.0f,
@@ -176,10 +180,9 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    DiffractionParams params;
     UIRenderer uiRenderer;
 
-    while(!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window)) {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -192,12 +195,6 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         shaderController.use();
-        shaderController.setUniform("u_show_pattern", params.showPattern);
-        shaderController.setUniform("u_show_grid",    params.showGrid);
-        shaderController.setUniform("u_slit_width",   params.getSlitWidth());
-        shaderController.setUniform("u_wavelength",   params.getWavelength());
-        shaderController.setUniform("u_distance",     params.getDistance());
-
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
