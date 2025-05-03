@@ -28,6 +28,8 @@ public:
 
     bool should_close() const noexcept;
 
+    GLFWwindow* getWindow() const noexcept { return window_; }
+
 private:
     void process_keyboard() const noexcept;
 

@@ -25,5 +25,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/in
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE ASSETS_PATH="${ASSETS_LOCATION}")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE fdr-defaults FdrWindow)
+target_link_libraries(${PROJECT_NAME} PRIVATE FdrWindow)
 
