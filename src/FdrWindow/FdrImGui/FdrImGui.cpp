@@ -14,27 +14,12 @@ namespace FdrImGui {
         ImGui::DestroyContext();
     }
 
-    void ImGuiWrapper::renew(const std::string& name, bool value) const noexcept {
-        if (auto it = bool_params_.find(name); it != bool_params_.end()) {
-            *it->second = value;
-        }
+    void ImGuiWrapper::addParameter(FdrParameters::Parameter<float>& param) {
+        float_params_.push_back(&param);
     }
 
-    void ImGuiWrapper::renew(const std::string& name, int value) const noexcept {}
-
-    void ImGuiWrapper::renew(const std::string& name, float value) const noexcept {
-        if (auto it = float_params_.find(name); it != float_params_.end()) {
-            *it->second = value;
-        }
-    }
-
-    template <typename T>
-    void ImGuiWrapper::addParameter(const std::string& name, T& value) {
-        if constexpr (std::is_same_v<T, float>) {
-            float_params_[name] = &value;
-        } else if constexpr (std::is_same_v<T, bool>) {
-            bool_params_[name] = &value;
-        }
+    void ImGuiWrapper::addParameter(FdrParameters::Parameter<bool>& param) {
+        bool_params_.push_back(&param);
     }
 
     void ImGuiWrapper::drawAllParameters() {
@@ -44,19 +29,24 @@ namespace FdrImGui {
 
         ImGui::Begin("Settings");
         
-        for (auto& [name, ptr] : float_params_) {
-            ImGui::InputFloat(name.c_str(), ptr);
+        for (auto* param : float_params_) {
+            float value = param->get();
+            const char* name = param->name().c_str();
+            if (ImGui::InputFloat(name, &value)) {
+                param->set_and_renew(value);
+            }
         }
 
-        for (auto& [name, ptr] : bool_params_) {
-            ImGui::Checkbox(name.c_str(), ptr);
+        for (auto* param : bool_params_) {
+            bool value = param->get();
+            const char* name = param->name().c_str();
+            if (ImGui::Checkbox(name, &value)) {
+                param->set_and_renew(value);
+            }
         }
 
         ImGui::End();
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
-
-    template void ImGuiWrapper::addParameter<float>(const std::string&, float&);
-    template void ImGuiWrapper::addParameter<bool> (const std::string&,  bool&);
 }

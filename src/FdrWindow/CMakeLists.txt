@@ -6,7 +6,7 @@ add_library(FdrWindow STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/FdrImGui/FdrImGui.cpp
 )
 
-target_include_directories(FdrWindow PUBLIC ${CMAKE_SOURCE_DIR}/include ${CMAKE_SOURCE_DIR}/third_party/imgui)
+target_include_directories(FdrWindow PUBLIC ${CMAKE_SOURCE_DIR}/include)
 
 target_link_libraries(FdrWindow PUBLIC fdr-defaults glad glfw OpenGL-shader-lib::OpenGL-shader-lib ImGui)
 

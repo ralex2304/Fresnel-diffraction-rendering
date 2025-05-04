@@ -33,5 +33,8 @@ void Parameter<T>::set_and_renew_if_changed(const T& value) noexcept {
         renewer_.renew(name_, value_ = value);
 }
 
+template class FdrParameters::Parameter<float>;
+template class FdrParameters::Parameter<bool>;
+
 }; //< namespace FdrParameters
 

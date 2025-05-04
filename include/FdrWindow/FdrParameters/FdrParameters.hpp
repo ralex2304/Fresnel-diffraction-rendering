@@ -16,6 +16,8 @@ public:
 template <typename T>
 class Parameter {
 public:
+    const std::string& name() const noexcept { return name_; }
+    
     Parameter(const ParameterRenewer& renewer, const std::string& name) noexcept;
     Parameter(const ParameterRenewer& renewer, const std::string& name, const T& value) noexcept;
 

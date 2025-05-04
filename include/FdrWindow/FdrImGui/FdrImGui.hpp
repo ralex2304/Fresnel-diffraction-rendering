@@ -1,28 +1,26 @@
 #pragma once
 
 #include "FdrWindow/FdrParameters/FdrParameters.hpp"
+
+#include <vector>
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <unordered_map>
 
 namespace FdrImGui {
-    class ImGuiWrapper : public FdrParameters::ParameterRenewer {
+    class ImGuiWrapper {
         public:
-            ImGuiWrapper(GLFWwindow* glfw_window);
-            ~ImGuiWrapper();
+        ImGuiWrapper(GLFWwindow* glfw_window);
+        ~ImGuiWrapper();
 
-            void renew(const std::string& name, bool value)  const noexcept override;
-            void renew(const std::string& name, int value)   const noexcept override;
-            void renew(const std::string& name, float value) const noexcept override;
+        void addParameter(FdrParameters::Parameter<float>& param);
+        void addParameter(FdrParameters::Parameter<bool>& param);
 
-            template <typename T>
-            void addParameter(const std::string& name, T& value);
+        void drawAllParameters();
 
-            void drawAllParameters();
-    
-        private:
-            mutable std::unordered_map<std::string, float*> float_params_;
-            mutable std::unordered_map<std::string,  bool*>  bool_params_;
-        };
+    private:
+    std::vector<FdrParameters::Parameter<float>*> float_params_;
+    std::vector<FdrParameters::Parameter<bool>*> bool_params_;
+    };
 } // namespace FdrImGui
