@@ -9,18 +9,15 @@
 #include <unordered_map>
 
 namespace FdrImGui {
-    class ImGuiWrapper {
-        public:
-        ImGuiWrapper(GLFWwindow* glfw_window);
-        ~ImGuiWrapper();
+class ImGuiWrapper {
+    public:
+    ImGuiWrapper(GLFWwindow* glfw_window);
+    ~ImGuiWrapper();
 
-        void addParameter(FdrParameters::Parameter<float>& param);
-        void addParameter(FdrParameters::Parameter<bool>& param);
+    void drawParameters(FdrParameters::ParametersStorage& storage);
 
-        void drawAllParameters();
-
-    private:
-    std::vector<FdrParameters::Parameter<float>*> float_params_;
-    std::vector<FdrParameters::Parameter<bool>*> bool_params_;
-    };
+private:
+    void drawParameter(FdrParameters::Parameter<float>& param);
+    void drawParameter(FdrParameters::Parameter<bool>& param);
+};
 } // namespace FdrImGui
