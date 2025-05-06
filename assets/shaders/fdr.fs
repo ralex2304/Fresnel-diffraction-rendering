@@ -3,6 +3,11 @@ out vec4 FragColor;
 
 in vec3 position;
 
+uniform float u_wavelength;
+uniform float u_hole_radius;
+uniform float u_screen_distance;
+uniform bool u_show_grid;
+
 void main()
 {
     float r = 1.0;
