@@ -1,8 +1,7 @@
 #pragma once
 
 #include <string>
-#include <vector>
-#include <type_traits>
+#include <unordered_map>
 
 namespace FdrParameters {
 
@@ -14,69 +13,54 @@ public:
     virtual void renew(const std::string& name, float value) const noexcept = 0;
 };
 
-class ParameterBase {
-public:
-    virtual ~ParameterBase() = default;
-    virtual const std::string& display_name() const noexcept = 0;
-    virtual void drawImGuiWidget() = 0;
-};
-
 template <typename T>
-class Parameter : public ParameterBase {
+class Parameter {
 public:
-    Parameter(
-        const ParameterRenewer& renewer,
-        const std::string& name,
-        const std::string& display_name,
-        const T& value = T()
-    );
+    Parameter(const ParameterRenewer& renewer, const std::string& name,
+             const T& value, const std::string& label)
+        : name(name)
+        , label(label)
+        , renewer_(renewer)
+        , value_(value) {}
 
-    const std::string& name() const noexcept;
-    const std::string& display_name() const noexcept override;
+    const std::string name;
+    const std::string label;
 
-    T get() const noexcept;
-    void set_and_renew(const T& value) noexcept;
-    void set_and_renew_if_changed(const T& value) noexcept;
+    const T& get() const {
+        return value_;
+    }
 
-    void drawImGuiWidget() override;
+    void set(const T& value) {
+        renewer_.renew(name, value_ = value);
+    }
 
 private:
     const ParameterRenewer& renewer_;
-    const std::string name_;
-    const std::string display_name_;
     T value_;
 };
 
-template<>
-void Parameter<float>::drawImGuiWidget();
-
-template<>
-void Parameter<bool>::drawImGuiWidget();
-
 class ParametersStorage {
 public:
-    class Iterator {
-    public:
-        Iterator(typename std::vector<ParameterBase*>::iterator it);
-        ParameterBase* operator*();
-        Iterator& operator++();
-        bool operator!=(const Iterator& other) const;
-
-    private:
-        typename std::vector<ParameterBase*>::iterator current_it_;
-    };
+    template <typename T>
+    constexpr std::unordered_map<std::string, Parameter<T>>& storage() {
+        if      constexpr (std::is_same_v<T, int>)   return int_params_;
+        else if constexpr (std::is_same_v<T, float>) return float_params_;
+        else if constexpr (std::is_same_v<T, bool>)  return bool_params_;
+        else static_assert(0, "Unknown params type");
+    }
 
     template <typename T>
-    void add(Parameter<T>& param);
-
-    Iterator begin() noexcept;
-    Iterator end() noexcept;
+    void add_parameter(const ParameterRenewer& renewer_, const std::string& name,
+                       const T& value, const std::string& label) {
+        storage<T>().insert({name, Parameter(renewer_, name, value, label)});
+        renewer_.renew(name, value);
+    }
 
 private:
-    std::vector<ParameterBase*> params_;
+    std::unordered_map<std::string, Parameter<int>>   int_params_;
+    std::unordered_map<std::string, Parameter<float>> float_params_;
+    std::unordered_map<std::string, Parameter<bool>>  bool_params_;
 };
 
-extern template class Parameter<float>;
-extern template class Parameter<bool>;
+}; //< namespace FdrParameters
 
-} // namespace FdrParameters

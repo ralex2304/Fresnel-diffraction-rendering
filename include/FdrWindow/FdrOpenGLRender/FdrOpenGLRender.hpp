@@ -17,14 +17,17 @@ public:
     void render() const noexcept;
 
     virtual void renew(const std::string& name, const bool value) const noexcept override {
+        shader_.use();
         shader_.set_bool(name, value);
     };
 
     virtual void renew(const std::string& name, const int value) const noexcept override {
+        shader_.use();
         shader_.set_int(name, value);
     };
 
     virtual void renew(const std::string& name, const float value) const noexcept override {
+        shader_.use();
         shader_.set_float(name, value);
     };
 
