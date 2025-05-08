@@ -10,6 +10,8 @@ OpenGLRender::OpenGLRender(const std::filesystem::path& vshader_path,
                            const std::filesystem::path& fshader_path)
     : shader_(vshader_path, fshader_path) {
 
+    shader_.use();
+
     glGenVertexArrays(1, &VAO_);
     glGenBuffers(1, &VBO_);
     glGenBuffers(1, &EBO_);
