@@ -22,7 +22,7 @@ public:
            const std::filesystem::path& fshader_path)
         : glfw_(width, height, title, opengl_version)
         , opengl_(vshader_path, fshader_path)
-        , imgui_(glfw_.getWindow(), params_) {
+        , imgui_(glfw_.get_window(), params_) {
 
         params_.add_parameter<float>(opengl_, "u_wavelength",  600.0f, "wavelength, nm");
         params_.add_parameter<float>(opengl_, "u_hole_radius", 0.2f,   "hole radius, mm");
