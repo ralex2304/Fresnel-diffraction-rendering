@@ -12,23 +12,9 @@ CPMAddPackage(
 )
 
 CPMAddPackage(
-    NAME glad
-    GITHUB_REPOSITORY Dav1dde/glad
-    GIT_TAG v2.0.8
-    DOWNLOAD_ONLY YES
-)
-
-if (glad_ADDED)
-    set(GLAD_GEN_DIR "${CMAKE_BINARY_DIR}/gladgen")
-    add_subdirectory("${glad_SOURCE_DIR}/cmake" glad_cmake)
-    glad_add_library(glad STATIC REPRODUCIBLE QUIET LOCATION ${GLAD_GEN_DIR} LOADER API gl:core=3.3)
-    include_directories("${GLAD_GEN_DIR}/include")
-endif ()
-
-CPMAddPackage(
     NAME OpenGL-shader-lib
     GITHUB_REPOSITORY ralex2304/OpenGL-shader-lib
-    VERSION 1.0.0
+    VERSION 1.0.1
 )
 
 CPMAddPackage(
